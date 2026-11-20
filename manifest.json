@@ -1,0 +1,12 @@
+{
+    "manifest_version": 3,
+    "name": "Clean Drift Score",
+    "version": "1.0.0",
+    "description": "Tracks your drift score between crashes. Whenever an impact occures, clean drift score will be reset back to 0.",
+    "content_scripts": [
+        {
+            "matches": ["*://nfsu2.xyz/*"],
+            "js": ["script.js"]
+        }
+    ]
+}
