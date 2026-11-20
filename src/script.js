@@ -72,9 +72,7 @@ function unsubscribe() {
     window.postMessage({ nfsu2: 'car-off' }, location.origin);
 }
 
-function create_cleanrun_score_tab() {
-    const panel = document.querySelector(".drift-panel");
-
+function create_cleanrun_score_tab(panel) {
     if (!panel) {
         log("Unable to find drift panel, aborting!");
         unsubscribe();
@@ -98,21 +96,50 @@ function create_cleanrun_score_tab() {
     return document.querySelector("#cleanrun-score b");
 }
 
-const points_span = create_cleanrun_score_tab();
+function wait_for_element(selector, callback) {
+    const exisitng = document.querySelector(selector);
+
+    if (exisitng) {
+        callback(exisitng);
+        return;
+    }
+
+    const observer = new MutationObserver(() => {
+        const element = document.querySelector(selector);
+
+        if (element) {
+            observer.disconnect();
+            callback(element);
+        }
+    });
+
+    observer.observe(document.body, {
+        childList: true,
+        subtree: true
+    });
+}
+
+let points_span = undefined;
 
 // Attach event listener to the window
 window.addEventListener('message', e => {
     if (e.source !== window || !e.data) return;
-    const m = e.data
+    const m = e.data;
 
     if (m.nfsu2 === 'feed-ready') {
         log("Feed updated");
     }
 
     if (m.nfsu2 === "car") {
-        handle_car(m)
+        handle_car(m);
         set_total_points(points_span, total_drift_points);
     }
-})
+});
 
-subscribe();
+wait_for_element(".drift-panel", (panel) => {
+    log("Drift panel found!");
+
+    points_span = create_cleanrun_score_tab(panel);
+
+    subscribe();
+});
