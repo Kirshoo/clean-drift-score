@@ -21,6 +21,10 @@ function has_crashed(data) {
     return true;
 }
 
+function is_in_race(data) {
+    return data.race.kind !== "none";
+}
+
 function handle_crash(data) {
     if (!has_crashed(data))
         return;
@@ -36,7 +40,13 @@ function update_total_points(data) {
     if (previous_total === data.race.driftScore)
         return;
 
+    if (data.race.driftScore === 0) {
+        log("Total drift score reset.");
+        previous_total = 0;
+    }
+
     let score_delta = data.race.driftScore - previous_total;
+    console.debug("New total score:", data.race.driftScore);
     total_drift_points += score_delta;
 
     log(`Score delta on frame ${data.frame}:`, score_delta);
@@ -59,6 +69,9 @@ function set_total_points(target, new_total) {
 }
 
 function handle_car(data) {
+    if (is_in_race(data))
+        return;
+
     update_total_points(data);
 
     handle_crash(data);
