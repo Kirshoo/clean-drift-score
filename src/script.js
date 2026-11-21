@@ -152,7 +152,11 @@ window.addEventListener('message', e => {
 wait_for_element(".drift-panel", (panel) => {
     log("Drift panel found!");
 
-    points_span = create_cleanrun_score_tab(panel);
+    let existing = document.querySelector("#cleanrun-score b");
+    if (!existing)
+        points_span = create_cleanrun_score_tab(panel);
+    else
+        points_span = existing;
 
     subscribe();
 });
